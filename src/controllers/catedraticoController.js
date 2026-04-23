@@ -5,7 +5,7 @@ const { Catedratico } = require('../models');
 const getCatedraticos = async (req, res) => {
   try {
     const catedraticos = await Catedratico.findAll({
-      where: { activo: true },
+      where: { activo: true, rol: 'CATEDRATICO' },
       attributes: { exclude: ['passwordHash'] }
     });
     res.json(catedraticos);
