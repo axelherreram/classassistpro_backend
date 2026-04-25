@@ -18,6 +18,9 @@ const generarRuleta = async (req, res) => {
     if (sesion.Clase.catedraticoId !== catedraticoId) {
         return res.status(403).json({ error: 'No tienes permiso para acceder a esta sesión.' });
     }
+    if (sesion.estado === 'finalizada') {
+        return res.status(400).json({ error: 'No se puede usar la ruleta porque la sesión ya está finalizada.' });
+    }
 
     // Buscar a todos los estudiantes que registraron asistencia en esta sesión
     const asistencias = await Asistencia.findAll({
@@ -65,6 +68,9 @@ const registrarParticipacion = async (req, res) => {
     const sesion = await Sesion.findByPk(sesionId, { include: Clase });
     if (!sesion || sesion.Clase.catedraticoId !== catedraticoId) {
         return res.status(403).json({ error: 'Sesión no válida o sin permisos.' });
+    }
+    if (sesion.estado === 'finalizada') {
+        return res.status(400).json({ error: 'No se puede registrar participación porque la sesión ya está finalizada.' });
     }
 
     if (!estudianteId || puntos == null) {

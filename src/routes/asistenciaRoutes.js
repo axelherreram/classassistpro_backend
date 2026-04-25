@@ -4,7 +4,8 @@ const {
   marcarAsistencia, 
   getAsistenciaPorSesion,
   crearSesion,
-  getSesionesPorClase
+  getSesionesPorClase,
+  finalizarSesion
 } = require('../controllers/asistenciaController');
 const { verifyToken, isCatedratico } = require('../middlewares/authMiddleware');
 
@@ -154,5 +155,31 @@ router.get('/sesion/:sesionId', getAsistenciaPorSesion);
  *         description: Devuelve el listado de sesiones
  */
 router.get('/clase/:claseId/sesiones', getSesionesPorClase);
+
+/**
+ * @swagger
+ * /api/asistencias/sesion/{sesionId}/finalizar:
+ *   patch:
+ *     summary: Finalizar una sesión de clase
+ *     tags: [Asistencias]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sesionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Sesión finalizada correctamente
+ *       400:
+ *         description: La sesión ya fue finalizada
+ *       403:
+ *         description: Sin permiso
+ *       404:
+ *         description: Sesión no encontrada
+ */
+router.patch('/sesion/:sesionId/finalizar', finalizarSesion);
 
 module.exports = router;

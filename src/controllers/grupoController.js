@@ -20,6 +20,9 @@ const generarGrupos = async (req, res) => {
         if (!sesion || sesion.Clase.catedraticoId !== catedraticoId) {
             return res.status(403).json({ error: 'Sesión no válida o sin permisos.' });
         }
+        if (sesion.estado === 'finalizada') {
+            return res.status(400).json({ error: 'No se pueden generar grupos porque la sesión ya está finalizada.' });
+        }
 
         if (!tipo || !cantidad || cantidad <= 0) {
             return res.status(400).json({ error: 'Debes definir el tipo y una cantidad válida.' });

@@ -19,6 +19,11 @@ const Sesion = sequelize.define('Sesion', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+  estado: {
+    type: DataTypes.ENUM('creada', 'finalizada'),
+    defaultValue: 'creada',
+    allowNull: false
+  },
   claseId: {
     type: DataTypes.INTEGER,
     references: {

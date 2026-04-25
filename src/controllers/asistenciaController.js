@@ -28,6 +28,10 @@ const generarQRSesion = async (req, res) => {
       return res.status(403).json({ error: 'No tienes permiso para generar un QR de esta sesión.' });
     }
 
+    if (sesion.estado === 'finalizada') {
+      return res.status(400).json({ error: 'No se puede generar un QR porque la sesión ya está finalizada.' });
+    }
+
     const baseUrlFrontend = process.env.FRONTEND_URL ;
 
     // Si la sesión YA tiene un token guardado y no se solicita regenerar, devolvemos el mismo QR
@@ -316,10 +320,45 @@ const getSesionesPorClase = async (req, res) => {
   }
 };
 
+/**
+ * 6. Finalizar una Sesión (Solo Catedráticos)
+ */
+const finalizarSesion = async (req, res) => {
+  try {
+    const { sesionId } = req.params;
+    const catedraticoId = req.user.id;
+
+    const sesion = await Sesion.findByPk(sesionId, {
+      include: [{ model: Clase }]
+    });
+
+    if (!sesion) {
+      return res.status(404).json({ error: 'Sesión no encontrada.' });
+    }
+
+    if (sesion.Clase.catedraticoId !== catedraticoId) {
+      return res.status(403).json({ error: 'No tienes permiso para finalizar esta sesión.' });
+    }
+
+    if (sesion.estado === 'finalizada') {
+      return res.status(400).json({ error: 'La sesión ya fue finalizada.' });
+    }
+
+    sesion.estado = 'finalizada';
+    await sesion.save();
+
+    res.json({ message: 'Sesión finalizada correctamente.', sesion });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al finalizar la sesión.' });
+  }
+};
+
 module.exports = {
   generarQRSesion,
   marcarAsistencia,
   getAsistenciaPorSesion,
   crearSesion,
-  getSesionesPorClase
+  getSesionesPorClase,
+  finalizarSesion
 };
